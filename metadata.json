@@ -1,0 +1,5 @@
+{
+  "name": "HelloJob",
+  "description": "A job search web page similar to HelloWork, using data from a CSV file.",
+  "requestFramePermissions": []
+}
