@@ -5,38 +5,39 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
-import Sidebar from './components/Sidebar';
 import JobCard from './components/JobCard';
 import Pagination from './components/Pagination';
 import { fetchJobs } from './utils/csvParser';
 import { Job } from './types';
-import { Filter } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 10;
+
+const CATEGORIES = [
+  { id: 'moa', name: 'MOA', gid: '0' },
+  { id: 'moe', name: 'MOE', gid: '1936288267' },
+  { id: 'entr_trvx', name: 'Entr trvx', gid: '2115456946' },
+  { id: 'fourn', name: 'Fourn', gid: '1715631405' },
+];
 
 export default function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  const [activeCategoryId, setActiveCategoryId] = useState(CATEGORIES[0].id);
   const [keyword, setKeyword] = useState('');
   const [location, setLocation] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const [filters, setFilters] = useState<{
-    contract: string[];
-    remote: string[];
-  }>({
-    contract: [],
-    remote: [],
-  });
 
   useEffect(() => {
     const loadJobs = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const data = await fetchJobs();
+        const activeCategory = CATEGORIES.find(c => c.id === activeCategoryId);
+        const data = await fetchJobs(activeCategory?.gid || '0');
         setJobs(data);
+        setCurrentPage(1); // Reset page when category changes
       } catch (err) {
         setError('Erreur lors du chargement des offres.');
         console.error(err);
@@ -45,7 +46,7 @@ export default function App() {
       }
     };
     loadJobs();
-  }, []);
+  }, [activeCategoryId]);
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -59,22 +60,9 @@ export default function App() {
         return false;
       }
 
-      // Contract filter
-      if (filters.contract.length > 0 && !filters.contract.includes(job.contractType)) {
-        return false;
-      }
-
-      // Remote filter
-      if (filters.remote.length > 0) {
-        const isRemote = job.remote.toLowerCase().includes('télétravail');
-        if (filters.remote.includes('Télétravail total') && !job.remote.toLowerCase().includes('total')) return false;
-        if (filters.remote.includes('Télétravail partiel') && !job.remote.toLowerCase().includes('partiel') && !job.remote.toLowerCase().includes('occasionnel')) return false;
-        if (filters.remote.includes('Pas de télétravail') && isRemote) return false;
-      }
-
       return true;
     });
-  }, [jobs, keyword, location, filters]);
+  }, [jobs, keyword, location]);
 
   const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
   const currentJobs = filteredJobs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -91,35 +79,27 @@ export default function App() {
         location={location} 
         setLocation={setLocation} 
         onSearch={handleSearch} 
+        categories={CATEGORIES}
+        activeCategoryId={activeCategoryId}
+        onCategoryChange={setActiveCategoryId}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col gap-8">
           
-          {/* Mobile filter toggle */}
+          {/* Mobile Title */}
           <div className="md:hidden flex justify-between items-center mb-4">
-            <h1 className="text-xl font-bold text-gray-900">{filteredJobs.length} offres d'emploi</h1>
-            <button 
-              onClick={() => setIsSidebarOpen(true)}
-              className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Filter className="h-4 w-4" />
-              Filtres
-            </button>
+            <h1 className="text-xl font-bold text-gray-900">
+              {filteredJobs.length} {CATEGORIES.find(c => c.id === activeCategoryId)?.name}
+            </h1>
           </div>
-
-          {/* Sidebar */}
-          <Sidebar 
-            isOpen={isSidebarOpen} 
-            onClose={() => setIsSidebarOpen(false)} 
-            filters={filters}
-            setFilters={setFilters}
-          />
 
           {/* Main Content */}
           <div className="flex-1">
             <div className="hidden md:block mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">{filteredJobs.length} offres d'emploi</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {filteredJobs.length} {CATEGORIES.find(c => c.id === activeCategoryId)?.name}
+              </h1>
             </div>
 
             {loading ? (

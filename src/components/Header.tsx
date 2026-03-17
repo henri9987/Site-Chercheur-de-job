@@ -1,15 +1,33 @@
 import React from 'react';
 import { Search, MapPin, Briefcase } from 'lucide-react';
 
+interface Category {
+  id: string;
+  name: string;
+  gid: string;
+}
+
 interface HeaderProps {
   keyword: string;
   setKeyword: (val: string) => void;
   location: string;
   setLocation: (val: string) => void;
   onSearch: () => void;
+  categories: Category[];
+  activeCategoryId: string;
+  onCategoryChange: (id: string) => void;
 }
 
-export default function Header({ keyword, setKeyword, location, setLocation, onSearch }: HeaderProps) {
+export default function Header({ 
+  keyword, 
+  setKeyword, 
+  location, 
+  setLocation, 
+  onSearch,
+  categories,
+  activeCategoryId,
+  onCategoryChange
+}: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,10 +37,19 @@ export default function Header({ keyword, setKeyword, location, setLocation, onS
             <span className="ml-2 text-xl font-bold text-gray-900">HelloJob</span>
           </div>
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-900 font-medium hover:text-[var(--color-primary)]">Emploi</a>
-            <a href="#" className="text-gray-500 hover:text-[var(--color-primary)]">Entreprises</a>
-            <a href="#" className="text-gray-500 hover:text-[var(--color-primary)]">Salaires</a>
-            <a href="#" className="text-gray-500 hover:text-[var(--color-primary)]">Conseils</a>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => onCategoryChange(cat.id)}
+                className={`font-medium transition-colors ${
+                  activeCategoryId === cat.id 
+                    ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]' 
+                    : 'text-gray-500 hover:text-[var(--color-primary)]'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
           </nav>
           <div className="flex items-center space-x-4">
             <button className="text-gray-500 hover:text-gray-900 font-medium">Connexion</button>
@@ -30,6 +57,23 @@ export default function Header({ keyword, setKeyword, location, setLocation, onS
               Créer un CV
             </button>
           </div>
+        </div>
+        
+        {/* Mobile Categories */}
+        <div className="md:hidden flex overflow-x-auto py-2 space-x-4 no-scrollbar border-t border-gray-100">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => onCategoryChange(cat.id)}
+              className={`whitespace-nowrap px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                activeCategoryId === cat.id 
+                  ? 'bg-[var(--color-primary)] text-white' 
+                  : 'text-gray-500 bg-gray-100 hover:bg-gray-200'
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
         
         {/* Search Bar */}

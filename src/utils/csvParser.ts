@@ -1,8 +1,8 @@
 import Papa from 'papaparse';
 import { Job } from '../types';
 
-export const fetchJobs = async (): Promise<Job[]> => {
-  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6MoqXH--QkcdfV3MrrYKxtjYYahiYx0eP29sde89bAsBHOI62tMtJoWexOvKZoUMQ1RnqgjmaLa0C/pub?gid=0&single=true&output=csv';
+export const fetchJobs = async (gid: string = '0'): Promise<Job[]> => {
+  const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT6MoqXH--QkcdfV3MrrYKxtjYYahiYx0eP29sde89bAsBHOI62tMtJoWexOvKZoUMQ1RnqgjmaLa0C/pub?gid=${gid}&single=true&output=csv`;
   
   return new Promise((resolve, reject) => {
     Papa.parse(url, {
@@ -59,7 +59,7 @@ export const fetchJobs = async (): Promise<Job[]> => {
           if (remote !== 'Non spécifié') tags.push(remote);
 
           return {
-            id: row.position || String(index),
+            id: `job-${index}`,
             title: row.title,
             company: company,
             location: location,
