@@ -9,6 +9,7 @@ export interface Job {
   description: string;
   source: string;
   datePost: string;
+  date: string;
   link: string;
   tags: string[];
 }

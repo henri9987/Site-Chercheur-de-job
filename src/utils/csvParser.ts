@@ -68,7 +68,8 @@ export const fetchJobs = async (gid: string = '0'): Promise<Job[]> => {
             remote: remote,
             description: row.description,
             source: row.source,
-            datePost: row['Date post'] || row.date,
+            datePost: row['Date post'] || '',
+            date: row.date || '',
             link: row.link,
             tags: tags,
           };

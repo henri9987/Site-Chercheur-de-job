@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Building2, Clock, Euro, Briefcase, ExternalLink } from 'lucide-react';
+import { MapPin, Building2, Clock, Euro, Briefcase, ExternalLink, Calendar } from 'lucide-react';
 import { Job } from '../types';
 
 interface JobCardProps {
@@ -36,10 +36,18 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
                 {job.salary}
               </div>
             )}
-            <div className="flex items-center">
-              <Clock className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-              {job.datePost}
-            </div>
+            {job.datePost && (
+              <div className="flex items-center">
+                <Clock className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                {job.datePost}
+              </div>
+            )}
+            {job.date && (
+              <div className="flex items-center">
+                <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                {job.date}
+              </div>
+            )}
           </div>
 
           <div className="mt-4">
